@@ -479,7 +479,7 @@ function doImport(e){
   var r=new FileReader();
   r.onload=function(ev){
     try{var d=JSON.parse(ev.target.result);
-      XP=d.XP||0;COINS=d.COINS||480;pity=d.pity||0;pulls=d.pulls||0;
+      XP=d.XP||0;COINS=d.COINS||120;pity=d.pity||0;pulls=d.pulls||0;
       coll=d.coll||{};newGot=d.newGot||{};scores=d.scores||{};
       saveP();updateUI();buildColl();buildLearn();buildHome();buildQuiz();toast('가져오기 완료! 📥');
     }catch(err){toast('파일을 읽을 수 없어요 ❌');}
@@ -487,14 +487,14 @@ function doImport(e){
 }
 function confirmReset(){
   if(confirm('정말 초기화할까요?\nXP·코인·컬렉션·퀴즈 기록이 모두 사라져요.')){
-    XP=0;COINS=480;pity=0;pulls=0;coll={};newGot={};scores={};
+    XP=0;COINS=120;pity=0;pulls=0;coll={};newGot={};scores={};
     saveP();updateUI();buildColl();buildLearn();buildHome();buildQuiz();toast('초기화 완료 🔄');
   }
 }
 
 // ══ STATE ══
 var _s=loadS()||{};
-var XP=_s.XP||0,COINS=_s.COINS||480,pity=_s.pity||0,pulls=_s.pulls||0;
+var XP=_s.XP||0,COINS=_s.COINS||120,pity=_s.pity||0,pulls=_s.pulls||0;
 var coll=_s.coll||{},newGot=_s.newGot||{},scores=_s.scores||{};
 var curUnit=1,qStep=0,qAns={},cfilt='ALL',spinning=false;
 
