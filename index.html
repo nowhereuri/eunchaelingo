@@ -375,11 +375,11 @@ body{padding:12px 0;}
         <div class="pity-box"><div class="pity-lbl"><span>💎 SSR 보장 천장</span><span id="pity-txt">남은 <b style="color:#FCD34D">50</b>회</span></div><div class="pity-bg"><div class="pity-fill" id="pity-fill" style="width:0%"></div></div></div>
         <div class="rates-box">
           <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.35);margin-bottom:7px;letter-spacing:.06em">확률표</div>
-          <div class="rate-row"><span class="pill rleg" style="font-size:10px">★★★ LEGEND</span><span class="rate-pct">1%</span></div>
-          <div class="rate-row"><span class="pill rssr" style="font-size:10px">★★ SSR</span><span class="rate-pct">3%</span></div>
-          <div class="rate-row"><span class="pill rsr" style="font-size:10px">★ SR</span><span class="rate-pct">21%</span></div>
-          <div class="rate-row"><span class="pill rr" style="font-size:10px">R</span><span class="rate-pct">35%</span></div>
-          <div class="rate-row"><span class="pill rn" style="font-size:10px">N</span><span class="rate-pct">40%</span></div>
+          <div class="rate-row"><span class="pill rleg" style="font-size:10px">★★★ LEGEND</span><span class="rate-pct">5%</span></div>
+          <div class="rate-row"><span class="pill rssr" style="font-size:10px">★★ SSR</span><span class="rate-pct">7%</span></div>
+          <div class="rate-row"><span class="pill rsr" style="font-size:10px">★ SR</span><span class="rate-pct">20%</span></div>
+          <div class="rate-row"><span class="pill rr" style="font-size:10px">R</span><span class="rate-pct">34%</span></div>
+          <div class="rate-row"><span class="pill rn" style="font-size:10px">N</span><span class="rate-pct">34%</span></div>
         </div>
 
         <!-- ── SURVIVAL GAME ── -->
@@ -1124,7 +1124,7 @@ function showResult(){
 }
 
 // ══ GACHA ══
-function pickR(fp){if(fp)return'SSR';var r=Math.random()*100;if(r<1)return'LEGEND';if(r<4)return'SSR';if(r<25)return'SR';if(r<60)return'R';return'N';}
+function pickR(fp){if(fp)return'SSR';var r=Math.random()*100;if(r<5)return'LEGEND';if(r<12)return'SSR';if(r<32)return'SR';if(r<66)return'R';return'N';}
 function pickCh(r){var p=CH.filter(function(c){return c.r===r;});return p[Math.floor(Math.random()*p.length)];}
 function doGacha(n){
   if(spinning)return;
