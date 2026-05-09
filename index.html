@@ -1364,9 +1364,9 @@ function vsSelectChar(id){
 var VS={
   raf:null,canvas:null,ctx:null,W:390,H:790,
   WW:1400,WH:1400,camX:0,camY:0,
-  player:{},enemies:[],projectiles:[],gems:[],particles:[],
+  player:{},enemies:[],projectiles:[],gems:[],particles:[],orbs:[],
   kills:0,level:1,gameXP:0,xpThresh:20,
-  gemCount:0,gemThresh:5,choosingSkill:false,
+  gemCount:0,gemThresh:5,gemThreshBase:5,skillPickCount:0,choosingSkill:false,
   elapsed:0,spawnTimer:0,spawnRate:100,bossTimer:0,
   joyDx:0,joyDy:0,running:false,
   ET:[
@@ -1388,9 +1388,9 @@ var VS={
     var bSpd=sM[Math.min(10,Math.max(1,Math.round(ch.speed/10)))]||2.8;
     var bDmg=Math.round(8+ch.power*0.5);
     this.player={x:this.WW/2,y:this.WH/2,hp:bHp,maxHp:bHp,speed:bSpd,dmg:bDmg,cool:0,rate:38,multi:1,emoji:ch.e,shielded:false,gemRange:70};
-    this.enemies=[];this.projectiles=[];this.gems=[];this.particles=[];
+    this.enemies=[];this.projectiles=[];this.gems=[];this.particles=[];this.orbs=[];
     this.kills=0;this.level=1;this.gameXP=0;this.xpThresh=20;
-    this.gemCount=0;this.gemThresh=5;this.choosingSkill=false;
+    this.gemCount=0;this.gemThresh=5;this.gemThreshBase=5;this.skillPickCount=0;this.choosingSkill=false;
     this.camX=this.WW/2-this.W/2;this.camY=this.WH/2-this.H/2;
     this.elapsed=0;this.spawnTimer=0;this.spawnRate=100;this.bossTimer=0;
     this.skillType=getCharSkill(ch);
@@ -1452,20 +1452,55 @@ var VS={
     // projectiles
     for(var i=this.projectiles.length-1;i>=0;i--){
       var pr=this.projectiles[i];pr.x+=pr.vx;pr.y+=pr.vy;pr.life--;
-      if(pr.life<=0||pr.x<0||pr.x>this.WW||pr.y<0||pr.y>this.WH){this.projectiles.splice(i,1);continue;}
+      // 반사탄
+      if(p.bounce){
+        if(pr.x<0||pr.x>this.WW){pr.vx*=-1;pr.bounces=(pr.bounces||0)+1;}
+        if(pr.y<0||pr.y>this.WH){pr.vy*=-1;pr.bounces=(pr.bounces||0)+1;}
+        if(pr.bounces>=(p.bounce)*2){this.projectiles.splice(i,1);continue;}
+      }
+      if(pr.life<=0||(!p.bounce&&(pr.x<0||pr.x>this.WW||pr.y<0||pr.y>this.WH))){this.projectiles.splice(i,1);continue;}
       for(var j=this.enemies.length-1;j>=0;j--){
         var en=this.enemies[j];
         if(Math.abs(pr.x-en.x)<22&&Math.abs(pr.y-en.y)<22){
-          en.hp-=pr.dmg;
+          var dmgDone=pr.dmg;
+          en.hp-=dmgDone;
+          if(p.vamp)p.hp=Math.min(p.maxHp,p.hp+dmgDone*(p.vamp));
           this.addPt(en.x,en.y,'💥');
-          this.projectiles.splice(i,1);
-          if(en.hp<=0){
-            this.kills++;this.gameXP+=en.xp;
-            this.gems.push({x:en.x,y:en.y});
-            this.enemies.splice(j,1);
-            if(this.gameXP>=this.xpThresh)this.levelUp();
+          // 연쇄 번개
+          if(p.chain){
+            var cself=this;
+            var chainTs=this.enemies.filter(function(e2,k2){return k2!==j&&Math.hypot(e2.x-en.x,e2.y-en.y)<130;}).slice(0,p.chain);
+            for(var ci=0;ci<chainTs.length;ci++){chainTs[ci].hp-=dmgDone*0.6;cself.addPt(chainTs[ci].x,chainTs[ci].y,'⚡');}
           }
+          this.projectiles.splice(i,1);
+          if(en.hp<=0){this.kills++;this.gameXP+=en.xp;this.gems.push({x:en.x,y:en.y});this.enemies.splice(j,1);if(this.gameXP>=this.xpThresh)this.levelUp();}
           break;
+        }
+      }
+    }
+    // 데미지 오라
+    if(p.aura){
+      for(var j=this.enemies.length-1;j>=0;j--){
+        var en=this.enemies[j];
+        if(Math.hypot(en.x-p.x,en.y-p.y)<80){
+          en.hp-=p.aura*0.06;
+          if(en.hp<=0){this.kills++;this.gameXP+=en.xp;this.gems.push({x:en.x,y:en.y});this.enemies.splice(j,1);if(this.gameXP>=this.xpThresh)this.levelUp();}
+        }
+      }
+    }
+    // 그림자 분신 자동 발사
+    if(p.clone){
+      p.cloneCd=(p.cloneCd||0)-1;
+      if(p.cloneCd<=0){
+        p.cloneCd=180;
+        var tgt2=this.nearest();
+        if(tgt2){
+          var ang2=Math.atan2(tgt2.y-p.y,tgt2.x-p.x);
+          for(var ci=0;ci<p.clone;ci++){
+            var aOff=ang2+(ci-(p.clone-1)/2)*0.4;
+            this.projectiles.push({x:p.x+(Math.random()-.5)*50,y:p.y+(Math.random()-.5)*50,vx:Math.cos(aOff)*7,vy:Math.sin(aOff)*7,dmg:p.dmg*0.7,life:p.projLife||140});
+          }
+          this.addPt(p.x,p.y,'👥');
         }
       }
     }
@@ -1482,6 +1517,21 @@ var VS={
       var g=this.gems[i];var gx=p.x-g.x,gy=p.y-g.y,gl=Math.sqrt(gx*gx+gy*gy);
       if(gl<(p.gemRange||70)){g.x+=gx/gl*4;g.y+=gy/gl*4;}
       if(gl<14){this.gems.splice(i,1);this.gemCount++;if(this.gemCount>=this.gemThresh){this.gemCount=0;this.showSkillSelect();}}
+    }
+    // orbs (회전 공격체)
+    for(var i=0;i<this.orbs.length;i++){
+      var ob=this.orbs[i];
+      ob.angle+=ob.speed;
+      ob.x=p.x+Math.cos(ob.angle)*ob.radius;
+      ob.y=p.y+Math.sin(ob.angle)*ob.radius;
+      ob.cooldown=(ob.cooldown||0)-1;
+      for(var j=this.enemies.length-1;j>=0;j--){
+        var en=this.enemies[j];
+        if(ob.cooldown<=0&&Math.hypot(ob.x-en.x,ob.y-en.y)<(ob.size||16)+14){
+          en.hp-=ob.dmg;ob.cooldown=18;this.addPt(en.x,en.y,'✨');
+          if(en.hp<=0){this.kills++;this.gameXP+=en.xp;this.gems.push({x:en.x,y:en.y});this.enemies.splice(j,1);if(this.gameXP>=this.xpThresh)this.levelUp();}
+        }
+      }
     }
     // particles
     for(var i=this.particles.length-1;i>=0;i--){var pt=this.particles[i];pt.life--;if(pt.life<=0)this.particles.splice(i,1);}
@@ -1524,6 +1574,16 @@ var VS={
       c.fillText(en.e,sx(en.x),sy(en.y));
       if(en.hp<en.maxHp){var bw=en.boss?40:28,bx=sx(en.x)-bw/2,by=sy(en.y)+(en.boss?20:16);c.fillStyle='rgba(0,0,0,.5)';c.fillRect(bx,by,bw,4);c.fillStyle=en.boss?'#ef4444':'#f87171';c.fillRect(bx,by,bw*(en.hp/en.maxHp),4);}
     });
+    // orbs 그리기
+    this.orbs.forEach(function(ob){
+      var ox=sx(ob.x),oy=sy(ob.y),sz=ob.size||16;
+      var og=c.createRadialGradient(ox,oy,1,ox,oy,sz);
+      og.addColorStop(0,ob.color||'rgba(251,191,36,1)');
+      og.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle=og;c.beginPath();c.arc(ox,oy,sz,0,Math.PI*2);c.fill();
+      c.font=Math.round(sz*1.2)+'px serif';c.textAlign='center';c.textBaseline='middle';
+      c.fillText(ob.emoji||'🔮',ox,oy);
+    });
     // 플레이어 화면 중심 좌표
     var spx=sx(p.x),spy=sy(p.y);
     if(p.shielded){
@@ -1538,6 +1598,12 @@ var VS={
       c.fillStyle=gr;c.beginPath();c.arc(spx,spy,24,0,Math.PI*2);c.fill();
     }
     if(self.slowTimer>0){c.fillStyle='rgba(147,197,253,.06)';c.fillRect(0,0,self.W,self.H);}
+    // 오라 링
+    if(p.aura){
+      var ag=c.createRadialGradient(spx,spy,40,spx,spy,82);
+      ag.addColorStop(0,'rgba(251,191,36,0)');ag.addColorStop(0.7,'rgba(251,191,36,.18)');ag.addColorStop(1,'rgba(251,191,36,0)');
+      c.fillStyle=ag;c.beginPath();c.arc(spx,spy,82,0,Math.PI*2);c.fill();
+    }
     c.font='28px serif';c.textAlign='center';c.textBaseline='middle';c.fillText(p.emoji||'🧙',spx,spy);
     // HUD
     c.fillStyle='rgba(0,0,0,.55)';c.fillRect(10,10,164,20);
@@ -1673,16 +1739,37 @@ var VS={
   },
 
   UPGRADES:[
-    {id:'dmg',ico:'⚔️',name:'공격력 강화',desc:'공격력 +25%',apply:function(p){p.dmg=Math.round(p.dmg*1.25);}},
-    {id:'spd',ico:'💨',name:'공격속도 강화',desc:'공격 쿨다운 -20%',apply:function(p){p.rate=Math.max(10,Math.round(p.rate*0.8));}},
-    {id:'hp',ico:'❤️',name:'생명력 강화',desc:'최대HP +30%, 즉시 회복',apply:function(p){p.maxHp=Math.round(p.maxHp*1.3);p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*0.15));}},
-    {id:'multi',ico:'🌟',name:'멀티샷',desc:'동시 발사 +1 (최대 5)',apply:function(p){p.multi=Math.min(5,p.multi+1);}},
-    {id:'mov',ico:'🏃',name:'이동속도 강화',desc:'이동속도 +20%',apply:function(p){p.speed=Math.min(6,p.speed*1.2);}},
-    {id:'range',ico:'🔮',name:'사거리 강화',desc:'투사체 사거리 +40%',apply:function(p){p.projLife=Math.round((p.projLife||140)*1.4);}},
-    {id:'cd',ico:'⚡',name:'스킬 쿨다운 감소',desc:'스킬 쿨다운 -25%',apply:function(p,vs){vs.skillMaxCd=Math.round(vs.skillMaxCd*0.75);}},
-    {id:'gem',ico:'💎',name:'보석 흡인',desc:'보석 흡인 범위 2배',apply:function(p){p.gemRange=(p.gemRange||70)*2;}},
-    {id:'heal',ico:'💚',name:'긴급 치료',desc:'즉시 최대HP의 40% 회복',apply:function(p){p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*0.4));}},
-    {id:'proj',ico:'🌀',name:'관통탄',desc:'투사체 크기+데미지 +50%',apply:function(p){p.dmg=Math.round(p.dmg*1.5);p.projLife=Math.round((p.projLife||140)*1.2);}}
+    // ── 기본 강화 ──
+    {id:'dmg',    ico:'⚔️', name:'공격력 강화',   desc:'공격력 +30%',                    apply:function(p,vs){p.dmg=Math.round(p.dmg*1.3);}},
+    {id:'spd',    ico:'💨', name:'공격속도 강화',  desc:'공격 쿨다운 -25%',               apply:function(p,vs){p.rate=Math.max(10,Math.round(p.rate*0.75));}},
+    {id:'hp',     ico:'❤️', name:'생명력 강화',    desc:'최대HP +35% + 즉시 회복',        apply:function(p,vs){p.maxHp=Math.round(p.maxHp*1.35);p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*0.2));}},
+    {id:'multi',  ico:'🌟', name:'멀티샷',          desc:'동시 발사 +1 (최대 6)',           apply:function(p,vs){p.multi=Math.min(6,p.multi+1);}},
+    {id:'mov',    ico:'🏃', name:'이동속도 강화',   desc:'이동속도 +25%',                  apply:function(p,vs){p.speed=Math.min(7,p.speed*1.25);}},
+    {id:'range',  ico:'🎯', name:'사거리 강화',     desc:'투사체 사거리 +50%',             apply:function(p,vs){p.projLife=Math.round((p.projLife||140)*1.5);}},
+    {id:'cd',     ico:'⚡', name:'쿨다운 감소',     desc:'스킬 쿨다운 -30%',               apply:function(p,vs){vs.skillMaxCd=Math.round(vs.skillMaxCd*0.7);}},
+    {id:'gem',    ico:'💎', name:'보석 자석',       desc:'보석 흡인 범위 3배',             apply:function(p,vs){p.gemRange=(p.gemRange||70)*3;}},
+    {id:'heal',   ico:'💚', name:'긴급 치료',       desc:'즉시 최대HP 50% 회복',           apply:function(p,vs){p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*0.5));}},
+    // ── 특수/고유 스킬 ──
+    {id:'orb1',   ico:'🔮', name:'마법 오브',       desc:'주변을 맴돌며 적을 공격하는 오브 +1',
+      apply:function(p,vs){var n=vs.orbs.length,ang=(n===0?0:Math.PI*2/n);vs.orbs.push({angle:ang*n,radius:70+n*12,speed:0.045,dmg:p.dmg*0.8,size:14,emoji:'🔮',color:'rgba(167,139,250,.8)',cooldown:0});}},
+    {id:'orb2',   ico:'🔥', name:'화염 오브',       desc:'불타는 오브 +1, 적에게 불꽃 데미지',
+      apply:function(p,vs){var n=vs.orbs.length;vs.orbs.push({angle:Math.PI+n*0.8,radius:80+n*10,speed:-0.055,dmg:p.dmg*1.1,size:16,emoji:'🔥',color:'rgba(239,68,68,.7)',cooldown:0});}},
+    {id:'orb3',   ico:'❄️', name:'빙결 오브',       desc:'얼음 오브 +1, 맞은 적 잠깐 감속',
+      apply:function(p,vs){var n=vs.orbs.length;vs.orbs.push({angle:n*1.2,radius:90+n*8,speed:0.035,dmg:p.dmg*0.6,size:14,emoji:'❄️',color:'rgba(147,197,253,.8)',cooldown:0,slow:true});}},
+    {id:'orbup',  ico:'💫', name:'오브 강화',       desc:'모든 오브 데미지 +60%, 속도 +30%',
+      apply:function(p,vs){vs.orbs.forEach(function(o){o.dmg*=1.6;o.speed*=1.3;o.size=Math.min(28,o.size+4);});}},
+    {id:'orbrad', ico:'🌀', name:'오브 확장',       desc:'모든 오브 궤도 반경 +50px',
+      apply:function(p,vs){vs.orbs.forEach(function(o){o.radius+=50;});}},
+    {id:'bounce', ico:'↩️', name:'반사탄',          desc:'투사체가 벽에 반사됨 (2회)',
+      apply:function(p,vs){p.bounce=(p.bounce||0)+2;}},
+    {id:'chain',  ico:'⚡', name:'연쇄 번개',       desc:'투사체 적중 시 인근 적에게 번개 연쇄',
+      apply:function(p,vs){p.chain=(p.chain||0)+1;}},
+    {id:'aura',   ico:'☀️', name:'데미지 오라',     desc:'플레이어 주변 60px에 지속 데미지',
+      apply:function(p,vs){p.aura=(p.aura||0)+p.dmg*0.3;}},
+    {id:'vamp',   ico:'🧛', name:'흡혈',            desc:'공격 데미지의 15%를 HP로 흡수',
+      apply:function(p,vs){p.vamp=(p.vamp||0)+0.15;}},
+    {id:'clone',  ico:'👥', name:'그림자 분신',     desc:'5초마다 잔상이 자동 공격 발사',
+      apply:function(p,vs){p.clone=(p.clone||0)+1;p.cloneCd=0;}},
   ],
 
   showSkillSelect:function(){
@@ -1710,6 +1797,9 @@ var VS={
     var u=this._pendingUpgrades[idx];
     if(!u)return;
     u.apply(this.player,this);
+    // 보석 임계값 점진 증가: 5→8→12→17→23...
+    this.skillPickCount++;
+    this.gemThresh=this.gemThreshBase+Math.round(this.skillPickCount*this.skillPickCount*1.5+this.skillPickCount*2);
     document.getElementById('vs-skill-select').style.display='none';
     this.choosingSkill=false;
     var el=document.getElementById('vs-lvup-msg');
@@ -1743,9 +1833,13 @@ var VS={
 
 function vsLaunch(){
   if(!selChar)return;
+  // 이전 캔버스 완전 초기화
+  var cv=document.getElementById('vs-canvas');
+  if(cv){var ctx2=cv.getContext('2d');ctx2.clearRect(0,0,cv.width,cv.height);}
   document.getElementById('vs-overlay').style.display='block';
+  document.getElementById('vs-skill-select').style.display='none';
   var go=document.getElementById('vs-gameover');go.style.display='none';go.innerHTML='';
-  // reset keys
+  document.getElementById('vs-lvup-msg').style.opacity='0';
   Object.keys(vsKeys).forEach(function(k){vsKeys[k]=0;});
   setupJoystick();VS.init(selChar);
 }
@@ -1754,7 +1848,7 @@ function vsExit(){
   VS.running=false;
   if(VS.raf){cancelAnimationFrame(VS.raf);VS.raf=null;}
   VS.choosingSkill=false;
-  VS.enemies=[];VS.projectiles=[];VS.gems=[];VS.particles=[];
+  VS.enemies=[];VS.projectiles=[];VS.gems=[];VS.particles=[];VS.orbs=[];
   if(VS.ctx)VS.ctx.clearRect(0,0,VS.W,VS.H);
   document.getElementById('vs-skill-select').style.display='none';
   document.getElementById('vs-gameover').style.display='none';
@@ -1786,8 +1880,9 @@ function setupJoystick(){
   function start(cx,cy,rect){active=true;ox=cx;oy=cy;base.style.left=(cx-rect.left-bsz/2)+'px';base.style.top=(cy-rect.top-bsz/2)+'px';base.style.display='block';knob.style.left=((bsz-ksz)/2)+'px';knob.style.top=((bsz-ksz)/2)+'px';}
   function move(cx,cy){if(!active)return;var dx=cx-ox,dy=cy-oy,dist=Math.sqrt(dx*dx+dy*dy),max=bsz/2-ksz/2,ang=Math.atan2(dy,dx),cl=Math.min(dist,max);knob.style.left=((bsz-ksz)/2+Math.cos(ang)*cl)+'px';knob.style.top=((bsz-ksz)/2+Math.sin(ang)*cl)+'px';VS.joyDx=dist>4?Math.cos(ang):0;VS.joyDy=dist>4?Math.sin(ang):0;}
   function end(){active=false;base.style.display='none';VS.joyDx=0;VS.joyDy=0;}
-  var clones=zone.cloneNode(false);zone.parentNode.replaceChild(clones,zone);zone=clones;
-  base=document.getElementById('vs-stick-base');knob=document.getElementById('vs-stick-knob');
+  var clones=zone.cloneNode(true);zone.parentNode.replaceChild(clones,zone);zone=clones;
+  base=zone.querySelector('#vs-stick-base')||document.getElementById('vs-stick-base');
+  knob=zone.querySelector('#vs-stick-knob')||document.getElementById('vs-stick-knob');
   zone.addEventListener('touchstart',function(e){e.preventDefault();var t=e.changedTouches[0];start(t.clientX,t.clientY,zone.getBoundingClientRect());},{passive:false});
   zone.addEventListener('touchmove',function(e){e.preventDefault();var t=e.changedTouches[0];move(t.clientX,t.clientY);},{passive:false});
   zone.addEventListener('touchend',function(e){e.preventDefault();end();},{passive:false});
