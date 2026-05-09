@@ -375,11 +375,11 @@ body{padding:12px 0;}
         <div class="pity-box"><div class="pity-lbl"><span>💎 SSR 보장 천장</span><span id="pity-txt">남은 <b style="color:#FCD34D">50</b>회</span></div><div class="pity-bg"><div class="pity-fill" id="pity-fill" style="width:0%"></div></div></div>
         <div class="rates-box">
           <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,.35);margin-bottom:7px;letter-spacing:.06em">확률표</div>
-          <div class="rate-row"><span class="pill rleg" style="font-size:10px">★★★ LEGEND</span><span class="rate-pct">5%</span></div>
-          <div class="rate-row"><span class="pill rssr" style="font-size:10px">★★ SSR</span><span class="rate-pct">7%</span></div>
+          <div class="rate-row"><span class="pill rleg" style="font-size:10px">★★★ LEGEND</span><span class="rate-pct">2%</span></div>
+          <div class="rate-row"><span class="pill rssr" style="font-size:10px">★★ SSR</span><span class="rate-pct">8%</span></div>
           <div class="rate-row"><span class="pill rsr" style="font-size:10px">★ SR</span><span class="rate-pct">20%</span></div>
-          <div class="rate-row"><span class="pill rr" style="font-size:10px">R</span><span class="rate-pct">34%</span></div>
-          <div class="rate-row"><span class="pill rn" style="font-size:10px">N</span><span class="rate-pct">34%</span></div>
+          <div class="rate-row"><span class="pill rr" style="font-size:10px">R</span><span class="rate-pct">35%</span></div>
+          <div class="rate-row"><span class="pill rn" style="font-size:10px">N</span><span class="rate-pct">35%</span></div>
         </div>
 
         <!-- ── SURVIVAL GAME ── -->
@@ -437,14 +437,21 @@ body{padding:12px 0;}
   <div id="vs-overlay" style="display:none;position:absolute;inset:0;background:#000;border-radius:40px;z-index:500;overflow:hidden;">
     <canvas id="vs-canvas" style="display:block;touch-action:none;"></canvas>
     <div id="vs-lvup-msg" style="position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:17px;font-weight:900;color:#a78bfa;text-shadow:0 0 20px rgba(167,139,250,.9);opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap;background:rgba(0,0,0,.6);padding:6px 16px;border-radius:20px;"></div>
-    <div id="vs-skill-btn" onclick="vsUseSkill()" style="position:absolute;bottom:168px;left:50%;transform:translateX(-50%);min-width:140px;padding:7px 14px;border-radius:18px;border:none;cursor:pointer;font-family:inherit;text-align:center;transition:all .15s;z-index:12;background:rgba(255,255,255,.12);color:rgba(255,255,255,.4);">스킬 로딩중...</div>
-    <div id="vs-joystick-zone" style="position:absolute;bottom:0;left:0;right:0;height:160px;touch-action:none;">
-      <div id="vs-stick-base" style="display:none;position:absolute;border-radius:50%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.18);">
-        <div id="vs-stick-knob" style="position:absolute;border-radius:50%;background:rgba(255,255,255,.3);"></div>
+    <div id="vs-skill-btn" onclick="vsUseSkill()" style="position:absolute;bottom:175px;right:16px;width:80px;height:80px;border-radius:50%;border:none;cursor:pointer;font-family:inherit;text-align:center;transition:all .15s;z-index:12;background:rgba(255,255,255,.12);color:rgba(255,255,255,.4);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.4);-webkit-tap-highlight-color:transparent;user-select:none;">스킬</div>
+    <div id="vs-joystick-zone" style="position:absolute;bottom:0;left:0;width:60%;height:170px;touch-action:none;">
+      <div id="vs-stick-base" style="display:none;position:absolute;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.22);box-shadow:0 0 20px rgba(167,139,250,.15);">
+        <div id="vs-stick-knob" style="position:absolute;border-radius:50%;background:rgba(167,139,250,.55);box-shadow:0 0 14px rgba(167,139,250,.4);border:2px solid rgba(255,255,255,.3);"></div>
       </div>
+      <div style="position:absolute;bottom:10px;left:12px;font-size:10px;color:rgba(255,255,255,.2);font-family:Noto Sans KR,sans-serif;pointer-events:none;">조이스틱</div>
     </div>
     <button onclick="vsExit()" style="position:absolute;top:10px;right:14px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;z-index:10;">✕ 종료</button>
     <div id="vs-gameover" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;z-index:20;padding:28px;border-radius:40px;backdrop-filter:blur(14px);background:rgba(0,0,0,.82);"></div>
+    <!-- 스킬 선택 오버레이 -->
+    <div id="vs-skill-select" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;z-index:30;backdrop-filter:blur(12px);background:rgba(0,0,0,.78);padding:20px;">
+      <div style="font-family:'Fredoka One',cursive;font-size:22px;color:#fbbf24;text-shadow:0 0 20px rgba(251,191,36,.6);margin-bottom:6px;">⬆️ 레벨 업!</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.55);font-family:Noto Sans KR,sans-serif;margin-bottom:18px;">스킬을 하나 선택하세요</div>
+      <div id="vs-skill-cards" style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;"></div>
+    </div>
   </div>
   <div class="overlay" id="ov-single"><div class="mbox"><div id="ms-beam"></div><div class="m-emo" id="ms-emo"></div><div class="m-rar pill" id="ms-rar"></div><br><div class="m-name" id="ms-name"></div><div class="m-en" id="ms-en"></div><div class="m-desc" id="ms-desc"></div><div class="m-flavor" id="ms-flav"></div><div id="ms-dup" class="m-dup">이미 보유 중! 중복으로 쌓여요 📦</div><button class="m-close" onclick="closeOv('ov-single')">확인! 👏</button></div></div>
   <div class="overlay" id="ov-multi"><div class="mbox" style="width:336px;padding:18px"><div style="font-size:16px;font-weight:900;color:var(--text);margin-bottom:12px">10회 뽑기 결과!</div><div class="multi-grid" id="multi-grid"></div><div style="font-size:12px;color:var(--sub);font-family:Noto Sans KR,sans-serif;margin-bottom:11px" id="multi-sum"></div><button class="m-close" onclick="closeOv('ov-multi')">확인! 👏</button></div></div>
@@ -496,6 +503,10 @@ function confirmReset(){
 var _s=loadS()||{};
 var XP=_s.XP||0,COINS=_s.COINS||120,pity=_s.pity||0,pulls=_s.pulls||0;
 var coll=_s.coll||{},newGot=_s.newGot||{},scores=_s.scores||{};
+// 하위 호환: 숫자 형태 coll을 {cnt,lv}로 마이그레이션
+Object.keys(coll).forEach(function(k){if(typeof coll[k]==='number')coll[k]={cnt:coll[k],lv:1};});
+function getCollLv(id){return coll[id]?coll[id].lv||1:0;}
+function getCollCnt(id){return coll[id]?coll[id].cnt||1:0;}
 var curUnit=1,qStep=0,qAns={},cfilt='ALL',spinning=false;
 
 // ══ SECTIONS (116 units) ══
@@ -1124,7 +1135,7 @@ function showResult(){
 }
 
 // ══ GACHA ══
-function pickR(fp){if(fp)return'SSR';var r=Math.random()*100;if(r<5)return'LEGEND';if(r<12)return'SSR';if(r<32)return'SR';if(r<66)return'R';return'N';}
+function pickR(fp){if(fp)return'SSR';var r=Math.random()*100;if(r<2)return'LEGEND';if(r<10)return'SSR';if(r<30)return'SR';if(r<65)return'R';return'N';}
 function pickCh(r){var p=CH.filter(function(c){return c.r===r;});return p[Math.floor(Math.random()*p.length)];}
 function doGacha(n){
   if(spinning)return;
@@ -1141,9 +1152,9 @@ function doGacha(n){
       var fp=(pity>=50);var r=pickR(fp);
       if(fp)pity=0;else if(r==='SSR'||r==='LEGEND')pity=0;
       var ch=pickCh(r),isNew=!coll[ch.id];
-      if(isNew)newGot[ch.id]=true;
-      coll[ch.id]=(coll[ch.id]||0)+1;
-      results.push({ch,isNew});
+      if(isNew){newGot[ch.id]=true;coll[ch.id]={cnt:1,lv:1};}
+      else{coll[ch.id].cnt=(coll[ch.id].cnt||1)+1;var maxLv=ch.r==='LEGEND'?10:ch.r==='SSR'?8:ch.r==='SR'?6:ch.r==='R'?5:4;if(coll[ch.id].lv<maxLv)coll[ch.id].lv++;}
+      results.push({ch,isNew,lv:coll[ch.id].lv});
     }
     saveP();updateUI();spinning=false;
     document.getElementById('btn1').disabled=false;document.getElementById('btn10').disabled=false;
@@ -1180,7 +1191,8 @@ function showSingle(ch,isNew){
   document.getElementById('ms-desc').textContent=ch.d;
   document.getElementById('ms-flav').textContent=ch.f;
   var re=document.getElementById('ms-rar');re.textContent=rm.lbl;re.className='m-rar pill '+rm.cls;
-  document.getElementById('ms-dup').style.display=isNew?'none':'block';
+  var dupEl=document.getElementById('ms-dup');
+  if(!isNew){var curLv=getCollLv(ch.id);var maxLv=ch.r==='LEGEND'?10:ch.r==='SSR'?8:ch.r==='SR'?6:ch.r==='R'?5:4;dupEl.innerHTML=curLv>=maxLv?'이미 최대 레벨! 최강의 존재 🏆':'중복 획득 → <b style="color:#a78bfa">Lv.'+curLv+' 레벨업!</b> ⬆️';dupEl.style.display='block';}else{dupEl.style.display='none';}
   document.getElementById('ms-beam').innerHTML=(ch.r==='LEGEND')?'<div class="lbeam"></div>':'';
   document.getElementById('ov-single').classList.add('on');
   // capsule machine has no g-center
@@ -1204,16 +1216,16 @@ function closeOv(id){document.getElementById(id).classList.remove('on');}
 
 // ══ COLLECTION ══
 function buildColl(){
-  var owned=Object.keys(coll).filter(function(k){return coll[k]>0;}).length;
+  var owned=Object.keys(coll).filter(function(k){return getCollCnt(k)>0;}).length;
   document.getElementById('g-coll').textContent=owned+'/40';
   document.getElementById('coll-lbl').textContent='('+owned+'/40)';
   document.getElementById('h-coll').textContent=owned;
   var list=CH.filter(function(c){return cfilt==='ALL'||c.r===cfilt;});
   var h='';
   list.forEach(function(c){
-    var cnt=coll[c.id]||0,isOwned=cnt>0,isNew=newGot[c.id],rm=RM[c.r];
+    var cnt=getCollCnt(c.id),lv=getCollLv(c.id),isOwned=cnt>0,isNew=newGot[c.id],rm=RM[c.r];
     h+='<div class="ci'+(isOwned?' owned':'')+(isNew?' ng':'')+'" style="'+(isOwned?'background:'+rm.bg+';border-color:'+rm.c+'55':'')+'" onclick="openCS(\''+c.id+'\')">';
-    if(isOwned&&cnt>1)h+='<div class="ci-cnt">×'+cnt+'</div>';
+    if(isOwned&&lv>1)h+='<div class="ci-cnt">Lv'+lv+'</div>';
     if(isNew)h+='<div class="ci-nb">NEW</div>';
     h+='<div class="ci-emo">'+(isOwned?c.e:'❓')+'</div>';
     h+='<div class="ci-name" style="color:'+(isOwned?rm.c:'rgba(255,255,255,.3)')+'">'+c.n+'</div>';
@@ -1231,7 +1243,7 @@ function filterColl(f,el){
 // ══ CHAR SHEET ══
 function openCS(id){
   var ch=CH.find(function(c){return c.id===id;});if(!ch)return;
-  var rm=RM[ch.r],isOwned=!!(coll[ch.id]),cnt=coll[ch.id]||0;
+  var rm=RM[ch.r],isOwned=!!(coll[ch.id]),cnt=getCollCnt(ch.id),lv=getCollLv(ch.id);
   var sheet=document.getElementById('cs');sheet.className='char-sheet cs'+ch.r;
   var h='<div class="cs-handle"></div>';
   if(!isOwned){
@@ -1241,7 +1253,7 @@ function openCS(id){
     h+='<div class="cs-hero">'+(ch.r==='LEGEND'?'<div class="lbeam" style="inset:-10px"></div>':'')
       +'<div class="cs-emo-bg" style="background:'+rm.bg+';box-shadow:0 0 28px '+rm.c+'44"><div class="cs-ring" style="border-color:'+rm.c+'66"></div><div class="cs-ring2" style="border-color:'+rm.c+'33"></div><div style="position:relative;z-index:2;font-size:52px">'+ch.e+'</div></div>'
       +'<div class="cs-name">'+ch.n+'</div><div class="cs-en">'+ch.en+'</div>'
-      +'<div class="cs-rar-badges"><span class="pill '+rm.cls+'" style="font-size:11px">'+star+rm.lbl+'</span>'+(cnt>1?'<span class="cs-cnt-badge">보유 ×'+cnt+'</span>':'')+'</div></div>'
+      +'<div class="cs-rar-badges"><span class="pill '+rm.cls+'" style="font-size:11px">'+star+rm.lbl+'</span><span class="cs-cnt-badge" style="background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.4);color:#c4b5fd">Lv.'+lv+'</span>'+(cnt>1?'<span class="cs-cnt-badge">보유 ×'+cnt+'</span>':'')+'</div></div>'
       +'<div class="cs-body">'
       +'<div class="cs-sec"><div class="cs-sec-t">스탯</div><div class="cs-stat-grid"><div class="cs-stat"><div class="cs-stat-ico">⚔️</div><div class="cs-stat-val">'+ch.power+'</div><div class="cs-stat-lbl">파워</div></div><div class="cs-stat"><div class="cs-stat-ico">💨</div><div class="cs-stat-val">'+ch.speed+'</div><div class="cs-stat-lbl">속도</div></div><div class="cs-stat"><div class="cs-stat-ico">🧠</div><div class="cs-stat-val">'+ch.smart+'</div><div class="cs-stat-lbl">지능</div></div></div></div>'
       +'<div class="cs-sec"><div class="cs-sec-t">고유 스킬</div><div class="cs-skill"><div class="cs-skill-name">✨ '+ch.skill+'</div><div class="cs-skill-desc">'+ch.skillDesc+'</div></div></div>'
@@ -1293,13 +1305,13 @@ var vsKeys={ArrowUp:0,ArrowDown:0,ArrowLeft:0,ArrowRight:0,w:0,a:0,s:0,d:0,' ':0
 
 // ══ SKILL DEFINITIONS ══
 var SKILL_DEF={
-  burst: {name:'💥 폭발',   desc:'주변 적 전체에 강한 피해',   cd:480, color:'#ef4444'},
-  dash:  {name:'💨 대시',   desc:'이동 방향으로 빠른 돌진',     cd:300, color:'#60a5fa'},
-  shield:{name:'🛡️ 방어막', desc:'2초 동안 무적 상태',         cd:600, color:'#fbbf24'},
-  heal:  {name:'💚 회복',   desc:'최대 HP의 30% 회복',         cd:720, color:'#34d399'},
-  slow:  {name:'❄️ 빙결',   desc:'모든 적을 4초간 감속',       cd:600, color:'#93c5fd'},
-  magnet:{name:'🧲 마그넷', desc:'화면 보석 전부 즉시 흡수',   cd:360, color:'#c4b5fd'},
-  snipe: {name:'🎯 저격',   desc:'8방향 강력 탄막 발사',       cd:420, color:'#fb923c'}
+  burst: {name:'폭발',   icon:'💥', desc:'주변 적 전체에 강한 피해',   cd:480, color:'#ef4444'},
+  dash:  {name:'대시',   icon:'💨', desc:'이동 방향으로 빠른 돌진',     cd:300, color:'#60a5fa'},
+  shield:{name:'방어막', icon:'🛡️', desc:'2초 동안 무적 상태',         cd:600, color:'#fbbf24'},
+  heal:  {name:'회복',   icon:'💚', desc:'최대 HP의 30% 회복',         cd:720, color:'#34d399'},
+  slow:  {name:'빙결',   icon:'❄️', desc:'모든 적을 4초간 감속',       cd:600, color:'#93c5fd'},
+  magnet:{name:'마그넷', icon:'🧲', desc:'화면 보석 전부 즉시 흡수',   cd:360, color:'#c4b5fd'},
+  snipe: {name:'저격',   icon:'🎯', desc:'8방향 강력 탄막 발사',       cd:420, color:'#fb923c'}
 };
 
 function getCharSkill(ch){
@@ -1318,7 +1330,7 @@ function getCharSkill(ch){
 }
 
 function buildGameChars(){
-  var owned=CH.filter(function(c){return coll[c.id]>0;});
+  var owned=CH.filter(function(c){return getCollCnt(c.id)>0;});
   var grid=document.getElementById('game-char-grid');if(!grid)return;
   if(!owned.length){grid.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:11px;font-family:Noto Sans KR;padding:6px 0">캡슐을 뽑아 캐릭터를 얻으세요!</div>';return;}
   var h='';
@@ -1351,8 +1363,10 @@ function vsSelectChar(id){
 // ══ VAMPIRE SURVIVORS ENGINE ══
 var VS={
   raf:null,canvas:null,ctx:null,W:390,H:790,
+  WW:1400,WH:1400,camX:0,camY:0,
   player:{},enemies:[],projectiles:[],gems:[],particles:[],
   kills:0,level:1,gameXP:0,xpThresh:20,
+  gemCount:0,gemThresh:5,choosingSkill:false,
   elapsed:0,spawnTimer:0,spawnRate:100,bossTimer:0,
   joyDx:0,joyDy:0,running:false,
   ET:[
@@ -1373,9 +1387,11 @@ var VS={
     var bHp=hpM[ch.r]||100;
     var bSpd=sM[Math.min(10,Math.max(1,Math.round(ch.speed/10)))]||2.8;
     var bDmg=Math.round(8+ch.power*0.5);
-    this.player={x:this.W/2,y:this.H/2,hp:bHp,maxHp:bHp,speed:bSpd,dmg:bDmg,cool:0,rate:38,multi:1,emoji:ch.e,shielded:false};
+    this.player={x:this.WW/2,y:this.WH/2,hp:bHp,maxHp:bHp,speed:bSpd,dmg:bDmg,cool:0,rate:38,multi:1,emoji:ch.e,shielded:false,gemRange:70};
     this.enemies=[];this.projectiles=[];this.gems=[];this.particles=[];
     this.kills=0;this.level=1;this.gameXP=0;this.xpThresh=20;
+    this.gemCount=0;this.gemThresh=5;this.choosingSkill=false;
+    this.camX=this.WW/2-this.W/2;this.camY=this.WH/2-this.H/2;
     this.elapsed=0;this.spawnTimer=0;this.spawnRate=100;this.bossTimer=0;
     this.skillType=getCharSkill(ch);
     var sd=SKILL_DEF[this.skillType];
@@ -1388,7 +1404,8 @@ var VS={
 
   loop:function(){
     if(!this.running)return;
-    this.update();this.draw();
+    if(!this.choosingSkill){this.update();}
+    this.draw();
     this.raf=requestAnimationFrame(this.loop.bind(this));
   },
 
@@ -1406,8 +1423,11 @@ var VS={
     if(len>0){dx/=len;dy/=len;}
     // remember last direction for dash
     if(len>0){this.lastDx=dx;this.lastDy=dy;}
-    p.x=Math.max(18,Math.min(this.W-18,p.x+dx*p.speed));
-    p.y=Math.max(18,Math.min(this.H-18,p.y+dy*p.speed));
+    p.x=Math.max(18,Math.min(this.WW-18,p.x+dx*p.speed));
+    p.y=Math.max(18,Math.min(this.WH-18,p.y+dy*p.speed));
+    // 카메라 추적
+    this.camX=Math.max(0,Math.min(this.WW-this.W,p.x-this.W/2));
+    this.camY=Math.max(0,Math.min(this.WH-this.H,p.y-this.H/2));
     // skill cooldown
     if(this.skillCd>0){this.skillCd--;this.updateSkillBtn();}
     // shield timer
@@ -1423,7 +1443,7 @@ var VS={
         if(el>0){
           for(var s=0;s<p.multi;s++){
             var ang=Math.atan2(ey,ex)+((s-(p.multi-1)/2)*0.22);
-            this.projectiles.push({x:p.x,y:p.y,vx:Math.cos(ang)*6,vy:Math.sin(ang)*6,dmg:p.dmg,life:90});
+            this.projectiles.push({x:p.x,y:p.y,vx:Math.cos(ang)*6,vy:Math.sin(ang)*6,dmg:p.dmg,life:p.projLife||140});
           }
         }
         p.cool=p.rate;
@@ -1432,7 +1452,7 @@ var VS={
     // projectiles
     for(var i=this.projectiles.length-1;i>=0;i--){
       var pr=this.projectiles[i];pr.x+=pr.vx;pr.y+=pr.vy;pr.life--;
-      if(pr.life<=0||pr.x<0||pr.x>this.W||pr.y<0||pr.y>this.H){this.projectiles.splice(i,1);continue;}
+      if(pr.life<=0||pr.x<0||pr.x>this.WW||pr.y<0||pr.y>this.WH){this.projectiles.splice(i,1);continue;}
       for(var j=this.enemies.length-1;j>=0;j--){
         var en=this.enemies[j];
         if(Math.abs(pr.x-en.x)<22&&Math.abs(pr.y-en.y)<22){
@@ -1460,8 +1480,8 @@ var VS={
     // gems
     for(var i=this.gems.length-1;i>=0;i--){
       var g=this.gems[i];var gx=p.x-g.x,gy=p.y-g.y,gl=Math.sqrt(gx*gx+gy*gy);
-      if(gl<70){g.x+=gx/gl*3.5;g.y+=gy/gl*3.5;}
-      if(gl<14)this.gems.splice(i,1);
+      if(gl<(p.gemRange||70)){g.x+=gx/gl*4;g.y+=gy/gl*4;}
+      if(gl<14){this.gems.splice(i,1);this.gemCount++;if(this.gemCount>=this.gemThresh){this.gemCount=0;this.showSkillSelect();}}
     }
     // particles
     for(var i=this.particles.length-1;i>=0;i--){var pt=this.particles[i];pt.life--;if(pt.life<=0)this.particles.splice(i,1);}
@@ -1479,36 +1499,46 @@ var VS={
 
   draw:function(){
     var c=this.ctx,p=this.player,self=this;
+    var cx=this.camX,cy=this.camY;
+    // 배경
     c.fillStyle='#080818';c.fillRect(0,0,this.W,this.H);
-    c.strokeStyle='rgba(255,255,255,.03)';c.lineWidth=1;
-    for(var x=0;x<this.W;x+=40){c.beginPath();c.moveTo(x,0);c.lineTo(x,this.H);c.stroke();}
-    for(var y=0;y<this.H;y+=40){c.beginPath();c.moveTo(0,y);c.lineTo(this.W,y);c.stroke();}
+    // 맵 배경 타일
+    c.strokeStyle='rgba(255,255,255,.025)';c.lineWidth=1;
+    var gOx=-(cx%60),gOy=-(cy%60);
+    for(var x=gOx;x<this.W;x+=60){c.beginPath();c.moveTo(x,0);c.lineTo(x,this.H);c.stroke();}
+    for(var y=gOy;y<this.H;y+=60){c.beginPath();c.moveTo(0,y);c.lineTo(this.W,y);c.stroke();}
+    // 맵 경계 표시
+    var bx1=-cx,by1=-cy,bx2=this.WW-cx,by2=this.WH-cy;
+    c.strokeStyle='rgba(239,68,68,.35)';c.lineWidth=3;
+    c.strokeRect(bx1,by1,this.WW,this.WH);
+    // 세계 좌표 → 화면 좌표 헬퍼
+    function sx(wx){return wx-cx;}function sy(wy){return wy-cy;}
     c.font='14px serif';c.textAlign='center';c.textBaseline='middle';
-    this.gems.forEach(function(g){c.fillText('💎',g.x,g.y);});
-    this.particles.forEach(function(pt){c.globalAlpha=pt.life/16;c.font='16px serif';c.fillText(pt.e,pt.x+(Math.random()-.5)*4,pt.y+(Math.random()-.5)*4);});
+    this.gems.forEach(function(g){c.fillText('💎',sx(g.x),sy(g.y));});
+    this.particles.forEach(function(pt){c.globalAlpha=pt.life/16;c.font='16px serif';c.fillText(pt.e,sx(pt.x)+(Math.random()-.5)*4,sy(pt.y)+(Math.random()-.5)*4);});
     c.globalAlpha=1;
     c.fillStyle='#fde68a';
-    this.projectiles.forEach(function(pr){c.beginPath();c.arc(pr.x,pr.y,5,0,Math.PI*2);c.fill();});
+    this.projectiles.forEach(function(pr){c.beginPath();c.arc(sx(pr.x),sy(pr.y),5,0,Math.PI*2);c.fill();});
     this.enemies.forEach(function(en){
       c.font=(en.boss?'32px':'24px')+' serif';c.textAlign='center';c.textBaseline='middle';
-      c.fillText(en.e,en.x,en.y);
-      if(en.hp<en.maxHp){var bw=en.boss?40:28,bx=en.x-bw/2,by=en.y+(en.boss?20:16);c.fillStyle='rgba(0,0,0,.5)';c.fillRect(bx,by,bw,4);c.fillStyle=en.boss?'#ef4444':'#f87171';c.fillRect(bx,by,bw*(en.hp/en.maxHp),4);}
+      c.fillText(en.e,sx(en.x),sy(en.y));
+      if(en.hp<en.maxHp){var bw=en.boss?40:28,bx=sx(en.x)-bw/2,by=sy(en.y)+(en.boss?20:16);c.fillStyle='rgba(0,0,0,.5)';c.fillRect(bx,by,bw,4);c.fillStyle=en.boss?'#ef4444':'#f87171';c.fillRect(bx,by,bw*(en.hp/en.maxHp),4);}
     });
-    // player glow / shield
+    // 플레이어 화면 중심 좌표
+    var spx=sx(p.x),spy=sy(p.y);
     if(p.shielded){
       c.strokeStyle='rgba(251,191,36,.8)';c.lineWidth=3;
-      c.beginPath();c.arc(p.x,p.y,28,0,Math.PI*2);c.stroke();
-      var sg=c.createRadialGradient(p.x,p.y,8,p.x,p.y,30);
+      c.beginPath();c.arc(spx,spy,28,0,Math.PI*2);c.stroke();
+      var sg=c.createRadialGradient(spx,spy,8,spx,spy,30);
       sg.addColorStop(0,'rgba(251,191,36,.2)');sg.addColorStop(1,'rgba(251,191,36,0)');
-      c.fillStyle=sg;c.beginPath();c.arc(p.x,p.y,30,0,Math.PI*2);c.fill();
+      c.fillStyle=sg;c.beginPath();c.arc(spx,spy,30,0,Math.PI*2);c.fill();
     } else {
-      var gr=c.createRadialGradient(p.x,p.y,4,p.x,p.y,24);
+      var gr=c.createRadialGradient(spx,spy,4,spx,spy,24);
       gr.addColorStop(0,'rgba(167,139,250,.35)');gr.addColorStop(1,'rgba(167,139,250,0)');
-      c.fillStyle=gr;c.beginPath();c.arc(p.x,p.y,24,0,Math.PI*2);c.fill();
+      c.fillStyle=gr;c.beginPath();c.arc(spx,spy,24,0,Math.PI*2);c.fill();
     }
-    // slow overlay
     if(self.slowTimer>0){c.fillStyle='rgba(147,197,253,.06)';c.fillRect(0,0,self.W,self.H);}
-    c.font='28px serif';c.textAlign='center';c.textBaseline='middle';c.fillText(p.emoji||'🧙',p.x,p.y);
+    c.font='28px serif';c.textAlign='center';c.textBaseline='middle';c.fillText(p.emoji||'🧙',spx,spy);
     // HUD
     c.fillStyle='rgba(0,0,0,.55)';c.fillRect(10,10,164,20);
     var hpFrac=Math.max(0,p.hp/p.maxHp);
@@ -1522,9 +1552,31 @@ var VS={
     c.fillStyle='#fff';c.textAlign='right';c.fillText('⏱ '+mm+':'+ss,this.W-12,20);
     c.fillStyle='rgba(0,0,0,.55)';c.fillRect(10,34,164,16);
     c.fillStyle='#fbbf24';c.textAlign='left';c.fillText('💀 '+this.kills+'  Lv.'+this.level,14,42);
-    var xpPct=Math.min(1,this.gameXP/this.xpThresh);
+    // 보석 수집 바 (파란)
+    var gemPct=Math.min(1,this.gemCount/this.gemThresh);
+    c.fillStyle='rgba(255,255,255,.08)';c.fillRect(0,this.H-10,this.W,5);
+    c.fillStyle='#38bdf8';c.fillRect(0,this.H-10,this.W*gemPct,5);
     c.fillStyle='rgba(255,255,255,.08)';c.fillRect(0,this.H-5,this.W,5);
+    var xpPct=Math.min(1,this.gameXP/this.xpThresh);
     c.fillStyle='#a78bfa';c.fillRect(0,this.H-5,this.W*xpPct,5);
+    // 미니맵
+    var mm2=76,mmX=this.W-mm2-8,mmY=54;
+    c.fillStyle='rgba(0,0,0,.6)';c.fillRect(mmX,mmY,mm2,mm2);
+    c.strokeStyle='rgba(255,255,255,.2)';c.lineWidth=1;c.strokeRect(mmX,mmY,mm2,mm2);
+    var scaleX=mm2/this.WW,scaleY=mm2/this.WH;
+    // 맵 경계
+    c.strokeStyle='rgba(239,68,68,.4)';c.lineWidth=1;c.strokeRect(mmX,mmY,mm2,mm2);
+    // 적 점
+    c.fillStyle='#f87171';
+    this.enemies.forEach(function(en){c.fillRect(mmX+en.x*scaleX-1,mmY+en.y*scaleY-1,2,en.boss?4:2);});
+    // 보석 점
+    c.fillStyle='#38bdf8';
+    this.gems.forEach(function(g){c.fillRect(mmX+g.x*scaleX-1,mmY+g.y*scaleY-1,2,2);});
+    // 플레이어
+    c.fillStyle='#a78bfa';c.beginPath();c.arc(mmX+p.x*scaleX,mmY+p.y*scaleY,3,0,Math.PI*2);c.fill();
+    // 시야 범위 표시
+    c.strokeStyle='rgba(167,139,250,.3)';c.lineWidth=1;
+    c.strokeRect(mmX+cx*scaleX,mmY+cy*scaleY,this.W*scaleX,this.H*scaleY);
   },
 
   nearest:function(){
@@ -1541,11 +1593,13 @@ var VS={
   },
 
   edge:function(){
+    var p=this.player;
+    var margin=280;
     var s=Math.floor(Math.random()*4);
-    if(s===0)return{x:Math.random()*this.W,y:-24};
-    if(s===1)return{x:Math.random()*this.W,y:this.H+24};
-    if(s===2)return{x:-24,y:Math.random()*this.H};
-    return{x:this.W+24,y:Math.random()*this.H};
+    if(s===0)return{x:p.x+(Math.random()-.5)*600,y:p.y-margin};
+    if(s===1)return{x:p.x+(Math.random()-.5)*600,y:p.y+margin};
+    if(s===2)return{x:p.x-margin,y:p.y+(Math.random()-.5)*600};
+    return{x:p.x+margin,y:p.y+(Math.random()-.5)*600};
   },
 
   addPt:function(x,y,e){this.particles.push({x:x,y:y,e:e,life:16});},
@@ -1590,7 +1644,7 @@ var VS={
     this.skillCd=this.skillMaxCd;this.updateSkillBtn();
     var el=document.getElementById('vs-lvup-msg');
     var sd=SKILL_DEF[t];
-    if(el){el.textContent=sd.name+' 발동!';el.style.color=sd.color;el.style.opacity='1';setTimeout(function(){el.style.opacity='0';el.style.color='#a78bfa';},1200);}
+    if(el){el.textContent=sd.icon+' '+sd.name+' 발동!';el.style.color=sd.color;el.style.opacity='1';setTimeout(function(){el.style.opacity='0';el.style.color='#a78bfa';},1200);}
   },
 
   updateSkillBtn:function(){
@@ -1601,10 +1655,9 @@ var VS={
     btn.style.background=ready?sd.color:'rgba(255,255,255,.12)';
     btn.style.color=ready?'#fff':'rgba(255,255,255,.4)';
     btn.style.boxShadow=ready?'0 2px 14px '+sd.color+'88':'none';
-    btn.innerHTML='<div style="font-size:14px;font-weight:900">'+sd.name+'</div>'
-      +'<div style="font-size:9px;opacity:.8;font-family:Noto Sans KR">'+sd.desc+'</div>'
-      +(ready?'<div style="font-size:9px;font-weight:800;margin-top:1px">SPACE / 탭</div>'
-             :'<div style="font-size:9px;font-weight:800;margin-top:1px;color:rgba(255,255,255,.5)">쿨다운 '+Math.ceil(this.skillCd/60)+'s</div>');
+    btn.innerHTML='<div style="font-size:18px;margin-bottom:2px">'+sd.icon+'</div>'
+      +'<div style="font-size:10px;font-weight:900;line-height:1.1">'+sd.name.slice(0,4)+'</div>'
+      +(ready?'':'<div style="font-size:9px;font-weight:800;color:rgba(255,255,255,.5)">'+Math.ceil(this.skillCd/60)+'s</div>');
   },
 
   levelUp:function(){
@@ -1619,8 +1672,54 @@ var VS={
     if(el){el.textContent='Lv.'+this.level+'  '+msg;el.style.opacity='1';setTimeout(function(){el.style.opacity='0';},1800);}
   },
 
+  UPGRADES:[
+    {id:'dmg',ico:'⚔️',name:'공격력 강화',desc:'공격력 +25%',apply:function(p){p.dmg=Math.round(p.dmg*1.25);}},
+    {id:'spd',ico:'💨',name:'공격속도 강화',desc:'공격 쿨다운 -20%',apply:function(p){p.rate=Math.max(10,Math.round(p.rate*0.8));}},
+    {id:'hp',ico:'❤️',name:'생명력 강화',desc:'최대HP +30%, 즉시 회복',apply:function(p){p.maxHp=Math.round(p.maxHp*1.3);p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*0.15));}},
+    {id:'multi',ico:'🌟',name:'멀티샷',desc:'동시 발사 +1 (최대 5)',apply:function(p){p.multi=Math.min(5,p.multi+1);}},
+    {id:'mov',ico:'🏃',name:'이동속도 강화',desc:'이동속도 +20%',apply:function(p){p.speed=Math.min(6,p.speed*1.2);}},
+    {id:'range',ico:'🔮',name:'사거리 강화',desc:'투사체 사거리 +40%',apply:function(p){p.projLife=Math.round((p.projLife||140)*1.4);}},
+    {id:'cd',ico:'⚡',name:'스킬 쿨다운 감소',desc:'스킬 쿨다운 -25%',apply:function(p,vs){vs.skillMaxCd=Math.round(vs.skillMaxCd*0.75);}},
+    {id:'gem',ico:'💎',name:'보석 흡인',desc:'보석 흡인 범위 2배',apply:function(p){p.gemRange=(p.gemRange||70)*2;}},
+    {id:'heal',ico:'💚',name:'긴급 치료',desc:'즉시 최대HP의 40% 회복',apply:function(p){p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*0.4));}},
+    {id:'proj',ico:'🌀',name:'관통탄',desc:'투사체 크기+데미지 +50%',apply:function(p){p.dmg=Math.round(p.dmg*1.5);p.projLife=Math.round((p.projLife||140)*1.2);}}
+  ],
+
+  showSkillSelect:function(){
+    this.choosingSkill=true;
+    var pool=this.UPGRADES.slice();
+    // 셔플
+    for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=pool[i];pool[i]=pool[j];pool[j]=tmp;}
+    var choices=pool.slice(0,3);
+    var self=this;
+    var html='';
+    choices.forEach(function(u,idx){
+      html+='<div onclick="VS.pickUpgrade('+idx+')" style="background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .15s;active:scale(.97)">'
+        +'<div style="font-size:36px;flex-shrink:0">'+u.ico+'</div>'
+        +'<div><div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:3px">'+u.name+'</div>'
+        +'<div style="font-size:12px;color:rgba(255,255,255,.6);font-family:Noto Sans KR,sans-serif">'+u.desc+'</div></div>'
+        +'</div>';
+    });
+    this._pendingUpgrades=choices;
+    var el=document.getElementById('vs-skill-select');
+    document.getElementById('vs-skill-cards').innerHTML=html;
+    el.style.display='flex';
+  },
+
+  pickUpgrade:function(idx){
+    var u=this._pendingUpgrades[idx];
+    if(!u)return;
+    u.apply(this.player,this);
+    document.getElementById('vs-skill-select').style.display='none';
+    this.choosingSkill=false;
+    var el=document.getElementById('vs-lvup-msg');
+    if(el){el.textContent=u.ico+' '+u.name+' 획득!';el.style.opacity='1';setTimeout(function(){el.style.opacity='0';},1800);}
+  },
+
   gameOver:function(){
     if(this.raf)cancelAnimationFrame(this.raf);
+    document.getElementById('vs-skill-select').style.display='none';
+    this.choosingSkill=false;
     var sec=Math.floor(this.elapsed/60);
     var mm=String(Math.floor(sec/60)).padStart(2,'0'),ss=String(sec%60).padStart(2,'0');
     var coinR=Math.round(this.kills*2+this.level*5);var xpR=Math.round(this.kills+this.level*3);
@@ -1652,8 +1751,17 @@ function vsLaunch(){
 }
 
 function vsExit(){
-  VS.running=false;if(VS.raf)cancelAnimationFrame(VS.raf);
+  VS.running=false;
+  if(VS.raf){cancelAnimationFrame(VS.raf);VS.raf=null;}
+  VS.choosingSkill=false;
+  VS.enemies=[];VS.projectiles=[];VS.gems=[];VS.particles=[];
+  if(VS.ctx)VS.ctx.clearRect(0,0,VS.W,VS.H);
+  document.getElementById('vs-skill-select').style.display='none';
+  document.getElementById('vs-gameover').style.display='none';
+  document.getElementById('vs-gameover').innerHTML='';
+  document.getElementById('vs-lvup-msg').style.opacity='0';
   document.getElementById('vs-overlay').style.display='none';
+  selChar=null;buildGameChars();
 }
 
 function vsUseSkill(){VS.activateSkill();}
@@ -1671,7 +1779,7 @@ function setupJoystick(){
   var zone=document.getElementById('vs-joystick-zone');
   var base=document.getElementById('vs-stick-base');
   var knob=document.getElementById('vs-stick-knob');
-  var bsz=80,ksz=36;
+  var bsz=96,ksz=44;
   base.style.width=bsz+'px';base.style.height=bsz+'px';
   knob.style.width=ksz+'px';knob.style.height=ksz+'px';
   var ox=0,oy=0,active=false;
