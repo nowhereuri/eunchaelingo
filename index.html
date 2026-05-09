@@ -1044,22 +1044,22 @@ function renderEx(){
   var h='';
   u.ex.forEach(function(x,i){
     h+='<div class="ex-item" id="exi-'+i+'"><div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:8px"><span style="color:var(--sub);margin-right:4px">Q'+(i+1)+'.</span>'+x.q+'</div><div>';
-    x.o.forEach(function(o){h+='<button class="opt-btn" id="eo-'+i+'-'+encodeURIComponent(o)+'" onclick="pickEx('+i+',\''+encodeURIComponent(o)+'\')">'+o+'</button>';});
+    x.o.forEach(function(o,j){h+='<button class="opt-btn" id="eo-'+i+'-'+j+'" onclick="pickEx('+i+','+j+')">'+o+'</button>';});
     h+='</div><div class="hint-tip" id="exh-'+i+'"></div></div>';
   });
   h+='<button class="btn btn-blue" id="ex-chk" style="background:'+sec.c+'" onclick="checkEx()">채점하기</button><div id="ex-res" style="display:none"></div>';
   document.getElementById('ud-e').innerHTML=h;
 }
-function pickEx(i,enc){
+function pickEx(i,j){
   if(es.checked)return;
-  var opt=decodeURIComponent(enc);es.a[i]=opt;
-  U[curUnit].ex[i].o.forEach(function(o){var b=document.getElementById('eo-'+i+'-'+encodeURIComponent(o));if(b)b.className='opt-btn'+(o===opt?' sel':'');});
+  var opt=U[curUnit].ex[i].o[j];es.a[i]=opt;
+  U[curUnit].ex[i].o.forEach(function(o,oi){var b=document.getElementById('eo-'+i+'-'+oi);if(b)b.className='opt-btn'+(oi===j?' sel':'');});
 }
 function checkEx(){
   var u=U[curUnit],sec=getSec(curUnit);es.checked=true;var right=0;
   u.ex.forEach(function(x,i){
     var v=es.a[i]||'',ok=v.toLowerCase()===x.a.toLowerCase();if(ok)right++;
-    x.o.forEach(function(o){var b=document.getElementById('eo-'+i+'-'+encodeURIComponent(o));if(b)b.className='opt-btn'+(o===x.a?' ok':(o===v&&!ok?' no':''));});
+    x.o.forEach(function(o,oi){var b=document.getElementById('eo-'+i+'-'+oi);if(b)b.className='opt-btn'+(o===x.a?' ok':(o===v&&!ok?' no':''));});
     if(!ok){var h=document.getElementById('exh-'+i);if(h){h.textContent='💡 '+x.h;h.style.display='block';}}
     var item=document.getElementById('exi-'+i);if(item)item.style.borderColor=ok?'#2DC653':'#E63946';
   });
@@ -1085,7 +1085,7 @@ function renderQ(){
   document.getElementById('q-txt').textContent=q.q;
   if(q.t==='c'){
     document.getElementById('q-fill').style.display='none';
-    var h='';q.o.forEach(function(o){h+='<button class="qopt" onclick="submitC(\''+encodeURIComponent(o)+'\')">'+o+'</button>';});
+    var h='';q.o.forEach(function(o,j){h+='<button class="qopt" onclick="submitC('+j+')">'+o+'</button>';});
     document.getElementById('q-opts').innerHTML=h;
   } else {
     document.getElementById('q-opts').innerHTML='';
@@ -1094,9 +1094,9 @@ function renderQ(){
     setTimeout(function(){document.getElementById('q-inp').focus();},80);
   }
 }
-function submitC(v){
-  var dec=decodeURIComponent(v);qAns[qStep]=dec;
+function submitC(j){
   var q=U[curUnit].q[qStep];
+  var dec=q.o[j];qAns[qStep]=dec;
   var ok=dec.toLowerCase().trim()===q.a.toLowerCase()||(q.alt&&dec.toLowerCase().trim()===q.alt.toLowerCase());
   if(ok){COINS+=3;updateUI();toast('+3🪙 정답!');}
   adv();
@@ -1539,11 +1539,13 @@ var VS={
     this.spawnTimer++;
     if(this.spawnTimer>=this.spawnRate){
       this.spawnTimer=0;
-      var cnt=1+Math.floor(this.level/3);
+      var sc2=this.skillPickCount||0;
+      var cnt=1+Math.floor(this.level/2)+Math.floor(sc2/2);
       for(var s=0;s<cnt;s++)this.spawn(false);
-      this.spawnRate=Math.max(28,100-this.level*5);
+      this.spawnRate=Math.max(18,100-this.level*6-sc2*4);
     }
-    this.bossTimer++;if(this.bossTimer>=3600){this.bossTimer=0;this.spawn(true);}
+    var bossInterval=Math.max(1200,3600-this.skillPickCount*200);
+    this.bossTimer++;if(this.bossTimer>=bossInterval){this.bossTimer=0;this.spawn(true);}
     this.elapsed++;
   },
 
@@ -1654,8 +1656,12 @@ var VS={
   spawn:function(boss){
     var ep=this.edge();
     var t=boss?this.ET[5]:this.ET[Math.floor(Math.random()*Math.min(5,1+Math.floor(this.level/2)))];
-    var hs=1+this.level*0.15;
-    this.enemies.push({x:ep.x,y:ep.y,hp:Math.round(t.hp*hs),maxHp:Math.round(t.hp*hs),spd:t.spd+(this.level*0.025),xp:t.xp,e:t.e,dmg:t.dmg+(this.level*0.5),boss:!!t.boss});
+    // 레벨 + 스킬 선택 횟수 기반 강화 (스킬 고를수록 몬스터도 강해짐)
+    var sc=this.skillPickCount||0;
+    var hs=1+this.level*0.18+sc*0.22;
+    var spdBonus=this.level*0.03+sc*0.04;
+    var dmgBonus=this.level*0.6+sc*0.8;
+    this.enemies.push({x:ep.x,y:ep.y,hp:Math.round(t.hp*hs),maxHp:Math.round(t.hp*hs),spd:t.spd+spdBonus,xp:Math.round(t.xp*(1+sc*0.1)),e:t.e,dmg:t.dmg+dmgBonus,boss:!!t.boss});
   },
 
   edge:function(){
